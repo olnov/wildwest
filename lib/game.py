@@ -8,6 +8,7 @@ GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
+
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
@@ -33,6 +34,7 @@ class Game:
         self.game_over = False
         self.ready_to_restart = False
         self.winner = None
+        self.start_screen = True
         
         # Load background image
         self.background = pygame.image.load("./assets/background_2.jpg")
@@ -47,6 +49,10 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
                 
+                if event.type == pygame.KEYDOWN and self.start_screen:
+                    if event.key == pygame.K_SPACE:
+                        self.start_screen = False
+
                 if event.type == pygame.KEYDOWN and not self.game_over:
                     if event.key == pygame.K_SPACE and self.game_started:
                         self.handle_shoot()
@@ -57,9 +63,6 @@ class Game:
                     elif self.ready_to_restart == False:
                         self.ready_to_restart = True
                     
-
-
-                                    
             # Update game state
             self.update()
 
@@ -108,8 +111,16 @@ class Game:
         self.left_shooter.draw(screen)
         self.right_shooter.draw(screen)
 
+        if self.start_screen:
+            welcome_text = font.render('Welcome to Highnoon shooter', True, WHITE)
+            welcome_rect = welcome_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
+            screen.blit(welcome_text, welcome_rect)
+
+            start_text = font.render('Press space to start', True, WHITE)
+            start_rect = start_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
+            screen.blit(start_text, start_rect)
         # Draw countdown or result
-        if not self.game_started:
+        elif not self.game_started:
             countdown_text = font.render('Get ready to fire..', True, WHITE)
             text_rect = countdown_text.get_rect(center=(SCREEN_WIDTH//2, 100))
             screen.blit(countdown_text, text_rect)

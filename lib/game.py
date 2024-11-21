@@ -2,14 +2,19 @@ import pygame
 from lib.shooter import Shooter
 import sys
 import random
+import time
 
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
+
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
+
+player_points = 0
+computer_points = 0
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -55,7 +60,13 @@ class Game:
         self.countdown_timer = pygame.time.get_ticks()
         self.game_started = False
         self.game_over = False
+        self.ready_to_restart = False
         self.winner = None
+        self.start_screen = True
+        self.player_points = 0
+        self.computer_points = 0
+        self.computer_shoot_speed = random.uniform(0.1, 1.5)
+        self.start = 0
         
         # Load background image
         self.background = pygame.image.load("./assets/background_2.jpg")
@@ -70,9 +81,24 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
                 
+                if event.type == pygame.KEYDOWN and self.start_screen:
+                    if event.key == pygame.K_SPACE:
+                        self.start_screen = False
+
+                if self.game_started and not self.game_over:
+                    if time.time() - self.start > self.computer_shoot_speed:
+                        self.computer_shoots()
+ 
                 if event.type == pygame.KEYDOWN and not self.game_over:
                     if event.key == pygame.K_SPACE and self.game_started:
                         self.handle_shoot()
+                
+                if event.type == pygame.KEYDOWN and self.game_over:
+                    if self.ready_to_restart == True and event.key == pygame.K_SPACE:
+                        self.handle_restart()
+                    elif self.ready_to_restart == False:
+                        self.ready_to_restart = True
+                    
 
             # Update game state
             self.update()
@@ -90,6 +116,7 @@ class Game:
             # Control game speed
             self.clock.tick(60)
 
+
         pygame.quit()
         sys.exit()
 
@@ -103,6 +130,17 @@ class Game:
                 
                 if self.countdown <= 0:
                     self.game_started = True
+                    self.start = time.time()
+
+    def computer_shoots(self):
+        self.computer_points += 1
+        self.game_over = True
+        self.ready_to_restart = False
+        self.game_started = False
+        print(self.player_points)
+        print(self.computer_points)
+        
+
 
         # Update shooters
         self.left_shooter.update()
@@ -110,13 +148,29 @@ class Game:
 
     def handle_shoot(self):
         # Implement shooting logic
+
         if not self.game_started or self.game_over:
             return
         
         self.left_shooter.shoot()
         self.fire_sound.play()
 
-        # self.game_over = True
+        if self.game_started and not self.game_over:
+            self.player_points += 1
+            self.game_over = True
+            self.ready_to_restart = False
+            self.game_started = False
+            print(self.player_points)
+            print(self.computer_points)
+
+
+    def handle_restart(self):
+        if self.game_over and self.ready_to_restart:
+            self.countdown = random.randint(2, 7)
+            self.game_over = False
+            self.game_started = False
+            self.start = 0
+            self.computer_shoot_speed = random.uniform(0.1, 1.5)
         
     def draw(self):
         # Draw the background
@@ -126,8 +180,16 @@ class Game:
         self.left_shooter.draw(screen)
         self.right_shooter.draw(screen)
 
+        if self.start_screen:
+            welcome_text = font.render('Welcome to Highnoon shooter', True, WHITE)
+            welcome_rect = welcome_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
+            screen.blit(welcome_text, welcome_rect)
+
+            start_text = font.render('Press space to start', True, WHITE)
+            start_rect = start_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
+            screen.blit(start_text, start_rect)
         # Draw countdown or result
-        if not self.game_started:
+        elif not self.game_started:
             countdown_text = font.render('Get ready to fire..', True, WHITE)
             text_rect = countdown_text.get_rect(center=(SCREEN_WIDTH//2, 100))
             screen.blit(countdown_text, text_rect)
@@ -135,7 +197,42 @@ class Game:
             result_text = font.render("Game Over!", True, WHITE)
             text_rect = result_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
             screen.blit(result_text, text_rect)
+
+            restart_text = font.render("Press space to start new round", True, WHITE)
+            restart_rect = restart_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
+            screen.blit(restart_text, restart_rect)
         elif self.game_started:
             fire_text = font.render('FIRE!', True, RED)
             text_rect = fire_text.get_rect(center=(SCREEN_WIDTH//2, 100))
             screen.blit(fire_text, text_rect)
+
+        # Draw player and computer scores
+        player_score = font.render(player_points, True, WHITE)
+        text_rect = player_score.get_rect(center=(20, 500))
+        screen.blit(player_score, text_rect)
+
+        computer_score = font.render(computer_points, True, WHITE)
+        text_rect = computer_score.get_rect(center=(SCREEN_WIDTH - 20, 500))
+        screen.blit(computer_score, text_rect)
+
+        
+    
+    def user_points_update(self):
+        player_score = font.render(player_points, True, WHITE)
+        text_rect = player_score.get_rect(center=(20, 500))
+        screen.blit(player_score, text_rect)
+
+        computer_score = font.render(computer_points, True, WHITE)
+        text_rect = computer_score.get_rect(center=(SCREEN_WIDTH - 20, 500))
+        screen.blit(computer_score, text_rect)
+
+        if self.victory:
+            global player_points += 1
+            player_score = font.render(player_points, True, WHITE)
+            text_rect = player_score.get_rect(center=(20, 500))
+            screen.blit(player_score, text_rect)
+        elif self.game_over:
+            global computer_points += 1
+            computer_score = font.render(computer_points, True, WHITE)
+            text_rect = computer_score.get_rect(center=(SCREEN_WIDTH - 20, 500))
+            screen.blit(computer_score, text_rect)

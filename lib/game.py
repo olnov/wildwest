@@ -25,7 +25,7 @@ class Game:
         
           # Initialize left and right shooters
         self.left_shooter = Shooter(
-            x=100,
+            x=200,
             y=SCREEN_HEIGHT // 2,
             idle_folder="./assets/left_shooter/idle",
             shoot_folder="./assets/left_shooter/shoot",
@@ -33,7 +33,7 @@ class Game:
         )
 
         self.right_shooter = Shooter(
-            x=SCREEN_WIDTH - 150,
+            x=SCREEN_WIDTH - 260,
             y=SCREEN_HEIGHT // 2,
             idle_folder="./assets/right_shooter/idle",
             shoot_folder="./assets/right_shooter/shoot",
@@ -46,6 +46,9 @@ class Game:
 
         print(f"Idle frames loaded: {len(self.idle_frames)}")
         print(f"Shooting frames loaded: {len(self.shooting_frames)}")
+
+        # Add this to your Game class initialization
+        self.fire_sound = pygame.mixer.Sound("./assets/soundfx/fire_shot01.mp3")
 
         # Countdown setup
         self.countdown = random.randint(2, 7)
@@ -110,7 +113,8 @@ class Game:
         if not self.game_started or self.game_over:
             return
         
-        self.left_shooter.shoot();
+        self.left_shooter.shoot()
+        self.fire_sound.play()
 
         # self.game_over = True
         

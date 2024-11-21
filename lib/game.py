@@ -31,6 +31,10 @@ class Game:
         self.game_started = False
         self.game_over = False
         self.winner = None
+        
+        # Load background image
+        self.background = pygame.image.load("./assets/background_2.jpg")
+        self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     def run(self):
         # Main game loop
@@ -49,7 +53,6 @@ class Game:
             self.update()
 
             # Drawing
-            screen.fill(BLACK)
             self.draw()
             
             # Update display
@@ -77,6 +80,9 @@ class Game:
         self.game_over = True
         
     def draw(self):
+        # Draw the background
+        screen.blit(self.background, (0, 0))
+
         # Draw shooters
         self.left_shooter.draw(screen)
         self.right_shooter.draw(screen)
@@ -84,9 +90,9 @@ class Game:
         # Draw countdown or result
         if not self.game_started:
             countdown_text = font.render(str(self.countdown), True, WHITE)
-            text_rect = countdown_text.get_rect(center=(SCREEN_WIDTH//2, 100))
+            text_rect = countdown_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
             screen.blit(countdown_text, text_rect)
         elif self.game_over:
             result_text = font.render("Game Over!", True, WHITE)
-            text_rect = result_text.get_rect(center=(SCREEN_WIDTH//2, 100))
+            text_rect = result_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
             screen.blit(result_text, text_rect)

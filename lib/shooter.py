@@ -24,7 +24,7 @@ class Shooter:
         # Shooting state
         self.shooting = False
         self.shooting_timer = 0
-        self.shooting_duration = 15  # Frames to display the shooting animation
+        self.shooting_duration = 20  # Frames to display the shooting animation
 
 
     def load_frames(self, folder, flip=False):

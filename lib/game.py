@@ -2,6 +2,7 @@ import pygame
 from lib.shooter import Shooter
 import sys
 import random
+import time
 
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
@@ -35,6 +36,10 @@ class Game:
         self.ready_to_restart = False
         self.winner = None
         self.start_screen = True
+        self.player_points = 0
+        self.computer_points = 0
+        self.computer_shoot_speed = random.uniform(0.1, 1.5)
+        self.start = 0
         
         # Load background image
         self.background = pygame.image.load("./assets/background_2.jpg")
@@ -53,6 +58,10 @@ class Game:
                     if event.key == pygame.K_SPACE:
                         self.start_screen = False
 
+                if self.game_started and not self.game_over:
+                    if time.time() - self.start > self.computer_shoot_speed:
+                        self.computer_shoots()
+ 
                 if event.type == pygame.KEYDOWN and not self.game_over:
                     if event.key == pygame.K_SPACE and self.game_started:
                         self.handle_shoot()
@@ -63,6 +72,7 @@ class Game:
                     elif self.ready_to_restart == False:
                         self.ready_to_restart = True
                     
+
             # Update game state
             self.update()
 
@@ -89,11 +99,27 @@ class Game:
                 
                 if self.countdown <= 0:
                     self.game_started = True
+                    self.start = time.time()
+
+    def computer_shoots(self):
+        self.computer_points += 1
+        self.game_over = True
+        self.ready_to_restart = False
+        self.game_started = False
+        print(self.player_points)
+        print(self.computer_points)
+        
+
 
     def handle_shoot(self):
         # Implement shooting logic
-        self.game_over = True
-        self.ready_to_restart = False
+        if self.game_started and not self.game_over:
+            self.player_points += 1
+            self.game_over = True
+            self.ready_to_restart = False
+            self.game_started = False
+            print(self.player_points)
+            print(self.computer_points)
 
 
     def handle_restart(self):
@@ -101,8 +127,9 @@ class Game:
             self.countdown = random.randint(2, 7)
             self.game_over = False
             self.game_started = False
+            self.start = 0
+            self.computer_shoot_speed = random.uniform(0.1, 1.5)
         
-
     def draw(self):
         # Draw the background
         screen.blit(self.background, (0, 0))

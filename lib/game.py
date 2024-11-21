@@ -1,6 +1,7 @@
 import pygame
 from lib.shooter import Shooter
 import sys
+import random
 
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
@@ -26,7 +27,7 @@ class Game:
         self.right_shooter = Shooter(SCREEN_WIDTH - 150, GREEN)
         
         # Countdown setup
-        self.countdown = 3
+        self.countdown = random.randint(2, 7)
         self.countdown_timer = pygame.time.get_ticks()
         self.game_started = False
         self.game_over = False
@@ -89,10 +90,14 @@ class Game:
 
         # Draw countdown or result
         if not self.game_started:
-            countdown_text = font.render(str(self.countdown), True, WHITE)
-            text_rect = countdown_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
+            countdown_text = font.render('Get ready to fire..', True, WHITE)
+            text_rect = countdown_text.get_rect(center=(SCREEN_WIDTH//2, 100))
             screen.blit(countdown_text, text_rect)
         elif self.game_over:
             result_text = font.render("Game Over!", True, WHITE)
             text_rect = result_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
             screen.blit(result_text, text_rect)
+        elif self.game_started:
+            fire_text = font.render('FIRE!', True, RED)
+            text_rect = fire_text.get_rect(center=(SCREEN_WIDTH//2, 100))
+            screen.blit(fire_text, text_rect)

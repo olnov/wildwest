@@ -31,6 +31,7 @@ class Game:
         self.countdown_timer = pygame.time.get_ticks()
         self.game_started = False
         self.game_over = False
+        self.ready_to_restart = False
         self.winner = None
         
         # Load background image
@@ -49,7 +50,16 @@ class Game:
                 if event.type == pygame.KEYDOWN and not self.game_over:
                     if event.key == pygame.K_SPACE and self.game_started:
                         self.handle_shoot()
+                
+                if event.type == pygame.KEYDOWN and self.game_over:
+                    if self.ready_to_restart == True and event.key == pygame.K_SPACE:
+                        self.handle_restart()
+                    elif self.ready_to_restart == False:
+                        self.ready_to_restart = True
+                    
 
+
+                                    
             # Update game state
             self.update()
 
@@ -61,6 +71,7 @@ class Game:
             
             # Control game speed
             self.clock.tick(60)
+
 
         pygame.quit()
         sys.exit()
@@ -79,7 +90,16 @@ class Game:
     def handle_shoot(self):
         # Implement shooting logic
         self.game_over = True
+        self.ready_to_restart = False
+
+
+    def handle_restart(self):
+        if self.game_over and self.ready_to_restart:
+            self.countdown = random.randint(2, 7)
+            self.game_over = False
+            self.game_started = False
         
+
     def draw(self):
         # Draw the background
         screen.blit(self.background, (0, 0))
@@ -97,6 +117,10 @@ class Game:
             result_text = font.render("Game Over!", True, WHITE)
             text_rect = result_text.get_rect(center=(SCREEN_WIDTH // 2, 100))
             screen.blit(result_text, text_rect)
+
+            restart_text = font.render("Press space to start new round", True, WHITE)
+            restart_rect = restart_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
+            screen.blit(restart_text, restart_rect)
         elif self.game_started:
             fire_text = font.render('FIRE!', True, RED)
             text_rect = fire_text.get_rect(center=(SCREEN_WIDTH//2, 100))

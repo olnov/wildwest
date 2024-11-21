@@ -128,12 +128,18 @@ class Game:
                 if self.countdown <= 0:
                     self.game_started = True
                     self.start = time.time()
+        
+        # Update shooters
+        self.left_shooter.update()
+        self.right_shooter.update()
 
     def computer_shoots(self):
         self.computer_points += 1
         self.game_over = True
         self.ready_to_restart = False
         self.game_started = False
+        self.right_shooter.shoot()
+        self.fire_sound.play()
         print(self.player_points)
         print(self.computer_points)
         
@@ -151,6 +157,7 @@ class Game:
         
         self.left_shooter.shoot()
         self.fire_sound.play()
+
 
         if self.game_started and not self.game_over:
             self.player_points += 1

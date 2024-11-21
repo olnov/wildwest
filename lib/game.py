@@ -11,6 +11,9 @@ WHITE = (255, 255, 255)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
+player_points = 0
+computer_points = 0
+
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 pygame.init()
@@ -101,3 +104,34 @@ class Game:
             fire_text = font.render('FIRE!', True, RED)
             text_rect = fire_text.get_rect(center=(SCREEN_WIDTH//2, 100))
             screen.blit(fire_text, text_rect)
+
+        # Draw player and computer scores
+        player_score = font.render(player_points, True, WHITE)
+        text_rect = player_score.get_rect(center=(20, 500))
+        screen.blit(player_score, text_rect)
+
+        computer_score = font.render(computer_points, True, WHITE)
+        text_rect = computer_score.get_rect(center=(SCREEN_WIDTH - 20, 500))
+        screen.blit(computer_score, text_rect)
+
+        
+    
+    def user_points_update(self):
+        player_score = font.render(player_points, True, WHITE)
+        text_rect = player_score.get_rect(center=(20, 500))
+        screen.blit(player_score, text_rect)
+
+        computer_score = font.render(computer_points, True, WHITE)
+        text_rect = computer_score.get_rect(center=(SCREEN_WIDTH - 20, 500))
+        screen.blit(computer_score, text_rect)
+
+        if self.victory:
+            global player_points += 1
+            player_score = font.render(player_points, True, WHITE)
+            text_rect = player_score.get_rect(center=(20, 500))
+            screen.blit(player_score, text_rect)
+        elif self.game_over:
+            global computer_points += 1
+            computer_score = font.render(computer_points, True, WHITE)
+            text_rect = computer_score.get_rect(center=(SCREEN_WIDTH - 20, 500))
+            screen.blit(computer_score, text_rect)

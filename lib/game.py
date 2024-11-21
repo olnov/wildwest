@@ -17,15 +17,36 @@ pygame.init()
 
 font = pygame.font.Font(None, 74)
 
+
 class Game:
     def __init__(self):
         # Clock to control game speed
         self.clock = pygame.time.Clock()
         
-        # Create two shooters
-        self.left_shooter = Shooter(100, RED)
-        self.right_shooter = Shooter(SCREEN_WIDTH - 150, GREEN)
-        
+          # Initialize left and right shooters
+        self.left_shooter = Shooter(
+            x=100,
+            y=SCREEN_HEIGHT // 2,
+            idle_folder="./assets/left_shooter/idle",
+            shoot_folder="./assets/left_shooter/shoot",
+            flip=False
+        )
+
+        self.right_shooter = Shooter(
+            x=SCREEN_WIDTH - 150,
+            y=SCREEN_HEIGHT // 2,
+            idle_folder="./assets/right_shooter/idle",
+            shoot_folder="./assets/right_shooter/shoot",
+            flip=True
+        )
+
+         # Collect frames for diagnostics (if needed)
+        self.idle_frames = self.left_shooter.idle_frames + self.right_shooter.idle_frames
+        self.shooting_frames = self.left_shooter.shooting_frames + self.right_shooter.shooting_frames
+
+        print(f"Idle frames loaded: {len(self.idle_frames)}")
+        print(f"Shooting frames loaded: {len(self.shooting_frames)}")
+
         # Countdown setup
         self.countdown = random.randint(2, 7)
         self.countdown_timer = pygame.time.get_ticks()
@@ -56,6 +77,10 @@ class Game:
             # Drawing
             self.draw()
             
+            # Shooters
+            self.left_shooter.draw(screen)
+            self.right_shooter.draw(screen)
+            
             # Update display
             pygame.display.flip()
             
@@ -76,9 +101,18 @@ class Game:
                 if self.countdown <= 0:
                     self.game_started = True
 
+        # Update shooters
+        self.left_shooter.update()
+        self.right_shooter.update()
+
     def handle_shoot(self):
         # Implement shooting logic
-        self.game_over = True
+        if not self.game_started or self.game_over:
+            return
+        
+        self.left_shooter.shoot();
+
+        # self.game_over = True
         
     def draw(self):
         # Draw the background
